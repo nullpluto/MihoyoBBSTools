@@ -153,7 +153,8 @@ class GameCheckin:
                             f"{tools.get_item(self.checkin_rewards[sign_days])}")
                     else:
                         s = "账号签到失败！"
-                        if data["data"] != "" and data.get("data").get("success", -1):
+                        log.warning(f"data: {data}")
+                        if data["data"] is not None and data.get("data").get("success", -1):
                             s += "原因: 验证码\njson信息:" + req.text
                         log.warning(s)
                         return_data += f"\n{account[0]}，触发验证码，本次签到失败"
