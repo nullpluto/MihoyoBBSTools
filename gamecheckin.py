@@ -107,6 +107,7 @@ class GameCheckin:
                 continue
             data = req.json()
             if data["retcode"] == 0 and data["data"]["success"] == 1 and i < retries:
+                log.warning(f"headers['Referer']: {self.headers['Referer']}")
                 validate = captcha.game_captcha(data["data"]["gt"], data["data"]["challenge"])
                 if validate:
                     header.update({
