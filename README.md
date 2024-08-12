@@ -78,14 +78,9 @@
 
 7. 点击一条捕获到的结果，往下拉，找到`Cookie:`
 
-8. 从`cookie_token_v2`开始复制到结尾
+8. 复制Cookie部分除`Cookie:`的全部内容
 
-   ```text
-   示例:
-   cookie_token_v2=xxx; account_mid_v2=xxx; ltoken_v2=xxx; ltmid_v2=xxx;
-   ```
-
-9. 将此处的复制到的 Cookie 先粘贴到 config 文件的 Cookie 处，如果末尾没有`;空格`请手动补上
+9. 将此处的复制到的 Cookie 先粘贴到 config 文件的 Cookie 处
 
 10. **此时 Cookie 已经获取完毕了**
 
@@ -275,8 +270,13 @@ ql repo https://github.com/Womsxd/MihoyoBBSTools.git "ql_main.py" "" "error|miho
 | AutoMihoyoBBS_config_path   | /ql/data/config/ | 设置配置文件路径（必选）         |
 | AutoMihoyoBBS_config_multi  | 1                | 开启多用户（可选）            |
 | AutoMihoyoBBS_config_prefix | mhy_             | 自定义文件开头(单用户可选，多用户推荐) |
+| AutoMihoyoBBS_push_project  | 1                | 使用项目自带的Push，而不是青龙的   |
+| AutoMihoyoBBS_push_path     | /ql/data/config/ | 项目自带的推送配置文件路径        |
+| AutoMihoyoBBS_push_name     | push             | 项目自带的推送配置文件名         |
 
 **注意！仅多用户需添加变量```AutoMihoyoBBS_config_multi```**
+
+`AutoMihoyoBBS_push_path`和`AutoMihoyoBBS_push_name`在青龙里面仅在启用项目自带的推送后才生效
 
 ### 3.复制配置文件
 
