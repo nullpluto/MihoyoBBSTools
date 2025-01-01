@@ -1,14 +1,14 @@
 # 米游社的Salt
 # java提取，会跟随版本更新
-mihoyobbs_salt = "oqrJbPCoFhWhFBNDvVRuldbrbiVxyWsP"
-mihoyobbs_salt_web = "zZDfHqEcwTqvvKDmqRcHyqqurxGgLfBV"
+mihoyobbs_salt = "GuODIETRPuJxpiUQoZairQxHtmzZKYFl"
+mihoyobbs_salt_web = "ACDpsiiEFSqqLiEpzXMuXNsLNqGkrIQc"
 # so提取 一般不会变
 mihoyobbs_salt_x4 = "xV8v4Qu54lUKrEYFZkJhB8cuOh9Asafs"
 mihoyobbs_salt_x6 = "t0qEgfub6cvueAPgR5m9aQWWVciEer7v"
 # 部分接口要带
 mihoyobbs_verify_key = "bll8iq97cem8"
 # 米游社的版本
-mihoyobbs_version = "2.75.2"  # Salt和Version相互对应
+mihoyobbs_version = "2.78.1"  # Salt和Version相互对应
 # 米游社的客户端类型
 mihoyobbs_Client_type = "2"  # 1为ios 2为安卓
 mihoyobbs_Client_type_web = "5"  # 4为pc web 5为mobile web
@@ -125,6 +125,10 @@ zzz_act_id = "e202406242138391"
 # 云原神相关api
 cloud_genshin_api = "https://api-cloudgame.mihoyo.com"
 cloud_genshin_sgin = f"{cloud_genshin_api}/hk4e_cg_cn/wallet/wallet/get"
+
+# 云绝区零相关api
+cloud_zzz_api = "https://cg-nap-api.mihoyo.com"
+cloud_zzz_sgin = f"{cloud_zzz_api}/nap_cn/cg/wallet/wallet/get"
 
 # 接下来是国际服的内容
 os_referer_url = "https://act.hoyolab.com/"
