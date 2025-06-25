@@ -15,29 +15,22 @@ headers.pop("Referer")
 
 def login():
     if not config.config["account"]["cookie"]:
-        log.error("请填入Cookies!")
+        log.error("请填入 Cookies！")
         config.clear_cookie()
         raise CookieError('No cookie')
     if config.config['account']['stoken'] == "":
-        log.error("无Stoken 请手动填入stoken!")
+        log.error("无 Stoken 请手动填入 stoken！")
         raise StokenError('no stoken')
-    # # 判断Cookie里面是否有login_ticket 没有的话直接退了
-    # login_ticket = get_login_ticket()
-    # if login_ticket is None:
-    #     log.error("cookie中没有'login_ticket'字段,请重新登录米游社，重新抓取cookie!")
-    #     config.clear_cookies()
-    #     raise CookieError('Cookie lost login_ticket')
     uid = get_uid()
     if uid is None:
-        log.error("cookie缺少UID，请重新抓取bbs的cookie")
+        log.error("cookie 缺少 UID，请重新抓取 bbs 的 cookie")
         config.clear_cookie()
         raise CookieError('Cookie expires')
     config.config["account"]["stuid"] = uid
-    # config.config["account"]["stoken"] = get_stoken(login_ticket, uid)
     if require_mid():
         config.config["account"]["mid"] = get_mid()
     log.info("登录成功！")
-    log.info("正在保存Config！")
+    log.info("正在保存 Config！")
     config.save_config()
 
 
@@ -56,12 +49,6 @@ def get_uid():
     uid_match = re.search(r"(account_id|ltuid|login_uid|ltuid_v2|account_id_v2)=(\d+)",
                           config.config["account"]["cookie"])
     if uid_match is None:
-        # stuid就是uid，先搜索cookie里面的，搜不到再用api获取
-        # data = http.get(url=setting.bbs_account_info,
-        #                 params={"login_ticket": config.config["account"]["login_ticket"]},
-        #                 headers=headers).json()
-        # if "成功" in data["data"]["msg"]:
-        #     uid = str(data["data"]["cookie_info"]["account_id"])
         return uid
     uid = uid_match.group(2)
     return uid
@@ -74,14 +61,14 @@ def get_stoken(login_ticket: str, uid: str) -> str:
     if data["retcode"] == 0:
         return data["data"]["list"][0]["token"]
     else:
-        log.error("login_ticket(只有半小时有效期)已失效,请重新登录米游社抓取cookie")
+        log.error("login_ticket（只有半小时有效期）已失效,请重新登录米游社抓取 cookie")
         config.clear_cookie()
         raise CookieError('Cookie expires')
 
 
 def get_cookie_token_by_stoken():
     if config.config["account"]["stoken"] == "" and config.config["account"]["stuid"] == "":
-        log.error("Stoken和Suid为空，无法自动更新CookieToken")
+        log.error("Stoken 和 Suid 为空，无法自动更新 CookieToken")
         config.clear_cookie()
         raise CookieError('Cookie expires')
     header = deepcopy(headers)
@@ -89,18 +76,18 @@ def get_cookie_token_by_stoken():
     data = http.get(url=setting.bbs_get_cookie_token_by_stoken,
                     headers=header).json()
     if data.get("retcode", -1) != 0:
-        log.error("stoken已失效，请重新抓取cookie")
+        log.error("stoken 已失效，请重新抓取 cookie")
         config.clear_stoken()
         raise StokenError('Stoken expires')
     return data["data"]["cookie_token"]
 
 
 def update_cookie_token() -> bool:
-    log.info("CookieToken失效，尝试刷新")
+    log.info("CookieToken 失效，尝试刷新")
     old_token_match = re.search(r'cookie_token=(.*?)(?:;|$)', config.config["account"]["cookie"])
     if old_token_match:
         new_token = get_cookie_token_by_stoken()
-        log.info("CookieToken刷新成功")
+        log.info("CookieToken 刷新成功")
         config.config["account"]["cookie"] = config.config["account"]["cookie"].replace(
             old_token_match.group(1), new_token)
         config.save_config()
@@ -130,28 +117,6 @@ def get_stoken_cookie() -> str:
         if config.config['account']['mid']:
             cookie += f";mid={config.config['account']['mid']}"
         else:
-            log.error(f"v2_stoken需要mid参数")
+            log.error(f"v2_stoken 需要 mid 参数")
             raise CookieError(f"cookie require mid parament")
     return cookie
-
-
-def update_stoken_v2():
-    if config.config["account"]["stoken"].startswith("v2_"):
-        return
-    log.info("stoken版本为v1，尝试升级为v2")
-    header = deepcopy(headers)
-    header["cookie"] = get_stoken_cookie()
-    header["x-rpc-app_id"] = "bll8iq97cem8"
-    data = http.post(url=setting.get_token_by_stoken, headers=header).json()
-    if data["retcode"] == 0:
-        stoken_v2 = data["data"]["token"]["token"]
-        config.config["account"]["stoken"] = stoken_v2
-        config.config["account"]["mid"] = data["data"]["user_info"]["mid"]
-        config.save_config()
-        log.info("升级stoken成功")
-    elif data["retcode"] == -100:
-        log.error("stoken已失效，请重新抓取cookie")
-        config.clear_stoken()
-        raise StokenError('Stoken expires')
-    else:
-        log.error("其他异常")

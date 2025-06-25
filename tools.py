@@ -86,11 +86,11 @@ def get_item(raw_data: dict) -> str:
     获取签到的奖励信息
 
     :param raw_data: 签到的奖励数据
-    :return: 签奖励名称x数量
+    :return: 「签奖励名称」x数量
     """
     temp_name = raw_data["name"]
     temp_cnt = raw_data["cnt"]
-    return f"{temp_name}x{temp_cnt}"
+    return f"「{temp_name}」x{temp_cnt}"
 
 
 def get_next_day_timestamp() -> int:
@@ -112,7 +112,7 @@ def time_conversion(minute: int) -> str:
     """
     h = minute // 60
     s = minute % 60
-    return f"{h}小时{s}分钟"
+    return f"{h} 小时 {s} 分钟"
 
 
 def tidy_cookie(cookies: str) -> str:
@@ -154,7 +154,7 @@ def get_openssl_version() -> int:
     try:
         import ssl
     except ImportError:
-        sys.exit("Openssl Lib Error !!")
+        raise ImportError("Openssl Lib Error !!")
         # return -99
         # 建议直接更新Python的版本，有特殊情况请提交issues
     temp_list = ssl.OPENSSL_VERSION_INFO
