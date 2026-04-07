@@ -83,9 +83,12 @@ class Mihoyobbs:
         req = http.get(url=setting.bbs_get_captcha, headers=self.headers)
         data = req.json()
         if data["retcode"] != 0:
+            log.warning(f"[Captcha] 获取BBS验证码参数失败: {data}")
             return None
+        log.info(f"[Captcha] BBS验证码参数, gt={data['data']['gt']}, challenge={data['data']['challenge']}")
         captcha_result = captcha.bbs_captcha(data["data"]["gt"], data["data"]["challenge"],
                                               self.headers.get("Referer", ""))
+        log.info(f"[Captcha] BBS验证码结果: {captcha_result} (type={type(captcha_result).__name__})")
         if captcha_result is not None:
             challenge = data["data"]["challenge"]
             if type(captcha_result) == dict:
@@ -99,8 +102,14 @@ class Mihoyobbs:
                                         "geetest_seccode": validate + "|jordan",
                                         "geetest_validate": validate})
             check = check_req.json()
+            log.info(f"[Captcha] BBS验证码verify结果: {check}")
             if check["retcode"] == 0:
+                log.info(f"[Captcha] BBS验证码通过, challenge={check['data']['challenge']}")
                 return check["data"]["challenge"]
+            else:
+                log.warning(f"[Captcha] BBS验证码verify失败: retcode={check['retcode']}")
+        else:
+            log.warning("[Captcha] BBS验证码求解返回None")
         return None
 
     # 获取任务列表，用来判断做了哪些任务

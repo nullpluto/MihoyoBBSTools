@@ -23,23 +23,35 @@ def geetest(gt: str, challenge: str, url: str):
         log.info('No API key configured for captcha')
         return None
 
+    log.info(f"[Captcha] 开始求解验证码, gt={gt}, challenge={challenge}, url={url}")
+
     api_key = config.config["captcha"]["api_key"]
     solver = TwoCaptcha(api_key, defaultTimeout=60, recaptchaTimeout=120)
 
     try:
         solver_response = solver.geetest(gt=gt, challenge=challenge, url=url)
+        log.info(f"[Captcha] solver 返回: {solver_response}")
 
         if solver_response:
             code_json_str = solver_response["code"]
             if code_json_str:
-                parsed_code = json.loads(code_json_str)
+                try:
+                    parsed_code = json.loads(code_json_str)
+                except json.JSONDecodeError:
+                    log.warning(f"[Captcha] JSON 解析失败, 原始内容: {code_json_str}")
+                    return None
                 if parsed_code:
-                    return {
+                    result = {
                         "challenge": parsed_code["geetest_challenge"],
                         "validate": parsed_code["geetest_validate"]
                     }
+                    log.info(f"[Captcha] 求解成功, challenge={result['challenge']}, validate={result['validate']}")
+                    return result
+            else:
+                log.warning("[Captcha] solver 返回的 code 为空")
+        else:
+            log.warning("[Captcha] solver 返回为空")
         return None
     except Exception as e:
-        log.exception("captcha error")
-        log.exception(e)
+        log.exception("[Captcha] 求解异常")
         return None

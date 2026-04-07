@@ -108,8 +108,10 @@ class GameCheckin:
                 continue
             data = result.json()
             if data["retcode"] == 0 and data["data"]["success"] == 1 and i < retries:
+                log.info(f"[Captcha] 游戏签到触发验证码, gt={data['data']['gt']}, challenge={data['data']['challenge']}")
                 captcha_result = captcha.game_captcha(data["data"]["gt"], data["data"]["challenge"],
                                                        self.headers.get('Referer', ''))
+                log.info(f"[Captcha] 游戏签到验证码结果: {captcha_result} (type={type(captcha_result).__name__})")
                 if captcha_result is not None:
                     challenge = data["data"]["challenge"]
                     if type(captcha_result) == dict:
@@ -122,6 +124,7 @@ class GameCheckin:
                         "x-rpc-validate": validate,
                         "x-rpc-seccode": f'{validate}|jordan'
                     })
+                    log.info(f"[Captcha] 已设置请求头, challenge={challenge}, validate={validate}")
                 time.sleep(random.randint(6, 15))
             else:
                 break
