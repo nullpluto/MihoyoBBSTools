@@ -5,19 +5,17 @@ import json
 import config
 
 
-def game_captcha(gt: str, challenge: str):
-    validate = geetest(gt, challenge,
-                       "https://webstatic.mihoyo.com/bbs/event/signin-ys/index.html?bbs_auth_required=true&act_id"
-                       "=e202009291139501&utm_source=bbs&utm_medium=mys&utm_campaign=icon")
-    return validate  # 失败返回None 成功返回validate
+def game_captcha(gt: str, challenge: str, url: str) -> dict:
+    # challenge不要直接用传入的，老格式也还支持，但是建议优先使用新格式
+    # 失败返回None 成功返回{"challenge":challenge,"validate":validate}
+    return geetest(gt, challenge, url)
 
 
-def bbs_captcha(gt: str, challenge: str):
-    validate = geetest(gt, challenge, 'https://passport-api.mihoyo.com/account/ma-cn-passport/app/loginByPassword')
-    return validate  # 失败返回None 成功返回validate
+def bbs_captcha(gt: str, challenge: str, url: str) -> dict:
+    return geetest(gt, challenge, url)
 
 
-def geetest(gt: str, challenge: str, referer: str):
+def geetest(gt: str, challenge: str, url: str):
     if "captcha" not in config.config:
         log.info('No captcha configured')
         return None
@@ -29,15 +27,17 @@ def geetest(gt: str, challenge: str, referer: str):
     solver = TwoCaptcha(api_key, defaultTimeout=60, recaptchaTimeout=120)
 
     try:
-        result = solver.geetest(gt=gt, challenge=challenge, url=referer)
+        solver_response = solver.geetest(gt=gt, challenge=challenge, url=url)
 
-        if result:
-            result_code = result["code"]
-            if result_code:
-                json_result_code = json.loads(result_code)
-                if json_result_code:
-                    geetest_validate = json_result_code["geetest_validate"]
-                    return geetest_validate
+        if solver_response:
+            code_json_str = solver_response["code"]
+            if code_json_str:
+                parsed_code = json.loads(code_json_str)
+                if parsed_code:
+                    return {
+                        "challenge": parsed_code["geetest_challenge"],
+                        "validate": parsed_code["geetest_validate"]
+                    }
         return None
     except Exception as e:
         log.exception("captcha error")
